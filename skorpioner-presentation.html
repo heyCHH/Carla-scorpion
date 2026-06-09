@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speakers Corner om Skorpioner</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: #1a1a2e;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 80px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+        }
+
+        .slide.prev {
+            opacity: 0;
+            transform: translateX(-100%);
+        }
+
+        /* ===== TITLE SLIDE ===== */
+        .slide-title {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            text-align: center;
+        }
+
+        .slide-title h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 4.5rem;
+            color: #fff;
+            text-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            animation: bounceIn 1s ease;
+        }
+
+        .slide-title .subtitle {
+            font-size: 1.8rem;
+            color: rgba(255,255,255,0.9);
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .title-scorpion-container {
+            margin: 30px 0;
+        }
+
+        /* ===== CONTENT SLIDES ===== */
+        .slide-1 { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        .slide-2 { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 50%, #d4fc79 100%); }
+        .slide-3 { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+        .slide-4 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+        .slide-5 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #fda085 100%); }
+        .slide-6 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+
+        .slide-content {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .slide-content h2 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.8rem;
+            color: #2d2d44;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 0 rgba(255,255,255,0.3);
+        }
+
+        .content-body {
+            display: flex;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .content-text {
+            flex: 1;
+        }
+
+        .content-image {
+            flex: 0 0 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content-text p {
+            font-size: 1.35rem;
+            color: #2d2d44;
+            line-height: 1.8;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+
+        .fun-fact {
+            background: rgba(255,255,255,0.4);
+            border-radius: 20px;
+            padding: 20px 28px;
+            margin-top: 15px;
+            border-left: 6px solid rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .fun-fact p {
+            font-size: 1.15rem !important;
+            font-style: italic;
+        }
+
+        .emoji-bullet {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+            align-items: center;
+        }
+
+        .nav button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.85);
+            color: #2d2d44;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .nav button:hover {
+            background: #fff;
+            transform: scale(1.15);
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+            margin: 0 10px;
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid rgba(255,255,255,0.6);
+        }
+
+        .dot.active {
+            background: #fff;
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 25px;
+            right: 35px;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+            font-weight: 700;
+            z-index: 100;
+            background: rgba(0,0,0,0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+        }
+
+        /* ===== FOOD LIST ===== */
+        .food-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .food-list li {
+            font-size: 1.3rem;
+            color: #2d2d44;
+            padding: 8px 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .food-icon {
+            font-size: 1.6rem;
+        }
+
+        /* ===== SIZE COMPARISON ===== */
+        .size-section {
+            display: flex;
+            gap: 40px;
+            margin-top: 10px;
+        }
+
+        .size-card {
+            flex: 1;
+            background: rgba(255,255,255,0.35);
+            border-radius: 24px;
+            padding: 28px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .size-card h3 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            color: #2d2d44;
+            margin-bottom: 12px;
+        }
+
+        .size-card p {
+            font-size: 1.15rem;
+            color: #2d2d44;
+            line-height: 1.7;
+            font-weight: 600;
+        }
+
+        .size-number {
+            font-family: 'Fredoka One', cursive;
+            font-size: 3rem;
+            color: #e74c3c;
+            display: block;
+            margin: 10px 0;
+        }
+
+        .size-number.small {
+            font-size: 2rem;
+            color: #3498db;
+        }
+
+        /* ===== COLOR SWATCHES ===== */
+        .color-grid {
+            display: flex;
+            gap: 18px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            width: 90px;
+            height: 90px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .color-swatch span {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #2d2d44;
+            white-space: nowrap;
+        }
+
+        .glow-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #00ff87, #60efff);
+            color: #1a1a2e;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-top: 30px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 10px #00ff87, 0 0 20px #00ff87; }
+            to { box-shadow: 0 0 20px #60efff, 0 0 40px #60efff, 0 0 60px #60efff; }
+        }
+
+        /* ===== AGE BAR ===== */
+        .age-bar-container {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .age-bar {
+            height: 40px;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #3498db 0%, #2ecc71 40%, #f1c40f 70%, #e74c3c 100%);
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .age-label-left {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 800;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .age-label-right {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 800;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(3deg); }
+            75% { transform: rotate(-3deg); }
+        }
+
+        /* ===== DECORATIVE BUBBLES ===== */
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .bubble-1 { width: 200px; height: 200px; background: #fff; top: -50px; right: -50px; }
+        .bubble-2 { width: 150px; height: 150px; background: #fff; bottom: -30px; left: -30px; }
+        .bubble-3 { width: 100px; height: 100px; background: #fff; top: 30%; left: -20px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .content-body { flex-direction: column; }
+            .content-image { flex: none; }
+            .slide-content h2 { font-size: 2rem; }
+            .slide-title h1 { font-size: 2.8rem; }
+            .slide { padding: 40px 30px; }
+            .size-section { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 0: Title -->
+<div class="slide slide-title active" data-index="0">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="title-scorpion-container float-animation">
+        <svg width="220" height="200" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Scorpion body -->
+            <ellipse cx="110" cy="130" rx="45" ry="28" fill="#2d2d44" />
+            <ellipse cx="110" cy="130" rx="38" ry="22" fill="#3d3d5c" />
+            <!-- Tail segments -->
+            <circle cx="155" cy="118" r="14" fill="#2d2d44"/>
+            <circle cx="172" cy="100" r="12" fill="#2d2d44"/>
+            <circle cx="182" cy="78" r="11" fill="#2d2d44"/>
+            <circle cx="178" cy="56" r="10" fill="#2d2d44"/>
+            <circle cx="165" cy="40" r="9" fill="#2d2d44"/>
+            <!-- Stinger -->
+            <path d="M165,40 Q158,20 155,28 Q152,36 160,38" fill="#e74c3c"/>
+            <circle cx="156" cy="24" r="4" fill="#e74c3c"/>
+            <!-- Left claw -->
+            <path d="M65,130 Q30,110 25,95 Q22,85 35,88 Q42,90 45,100" fill="#2d2d44" stroke="#3d3d5c" stroke-width="2"/>
+            <path d="M25,95 Q15,80 22,75 Q28,72 30,82" fill="#2d2d44"/>
+            <!-- Right claw -->
+            <path d="M65,125 Q40,100 35,85 Q32,75 45,78 Q52,80 50,92" fill="#2d2d44" stroke="#3d3d5c" stroke-width="2"/>
+            <path d="M35,85 Q25,70 32,65 Q38,62 40,72" fill="#2d2d44"/>
+            <!-- Legs -->
+            <line x1="85" y1="145" x2="60" y2="170" stroke="#2d2d44" stroke-width="4" stroke-linecap="round"/>
+            <line x1="95" y1="148" x2="75" y2="175" stroke="#2d2d44" stroke-width="4" stroke-linecap="round"/>
+            <line x1="125" y1="148" x2="145" y2="175" stroke="#2d2d44" stroke-width="4" stroke-linecap="round"/>
+            <line x1="135" y1="145" x2="160" y2="170" stroke="#2d2d44" stroke-width="4" stroke-linecap="round"/>
+            <!-- Eyes -->
+            <circle cx="95" cy="120" r="4" fill="#fff"/>
+            <circle cx="95" cy="120" r="2" fill="#1a1a2e"/>
+            <circle cx="108" cy="118" r="4" fill="#fff"/>
+            <circle cx="108" cy="118" r="2" fill="#1a1a2e"/>
+            <!-- Sparkle on stinger -->
+            <circle cx="156" cy="22" r="2" fill="#ff6b6b" opacity="0.8"/>
+        </svg>
+    </div>
+    <h1>Speakers Corner<br>om Skorpioner</h1>
+    <p class="subtitle">Lavet af Carla May</p>
+</div>
+
+<!-- SLIDE 1: Hvad spiser skorpioner? -->
+<div class="slide slide-1" data-index="1">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="slide-content">
+        <h2>&#x1F372; Hvad spiser skorpioner?</h2>
+        <div class="content-body">
+            <div class="content-text">
+                <p>En skorpion er et <strong>rovdyr</strong>, der spiser sm&aring; dyr, som den fanger med sine kl&oslash;er og lammer med sin giftbrod.</p>
+                <p>For eksempel:</p>
+                <ul class="food-list">
+                    <li><span class="food-icon">&#x1F98B;</span> Insekter</li>
+                    <li><span class="food-icon">&#x1F997;</span> Gr&aelig;shopper og kakerlakker</li>
+                    <li><span class="food-icon">&#x1F577;&#xFE0F;</span> Edderkopper</li>
+                    <li><span class="food-icon">&#x1F98E;</span> Sm&aring; firben</li>
+                    <li><span class="food-icon">&#x1F401;</span> Sm&aring; mus</li>
+                </ul>
+            </div>
+            <div class="content-image float-animation">
+                <svg width="280" height="250" viewBox="0 0 280 250" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Scorpion hunting scene -->
+                    <!-- Ground -->
+                    <rect x="0" y="200" width="280" height="50" rx="10" fill="#c9a96e" opacity="0.5"/>
+                    <rect x="0" y="210" width="280" height="40" rx="10" fill="#b8965a" opacity="0.3"/>
+                    <!-- Scorpion -->
+                    <ellipse cx="140" cy="175" rx="35" ry="20" fill="#8B4513"/>
+                    <ellipse cx="140" cy="175" rx="28" ry="15" fill="#A0522D"/>
+                    <!-- Tail -->
+                    <circle cx="175" cy="165" r="10" fill="#8B4513"/>
+                    <circle cx="188" cy="150" r="9" fill="#8B4513"/>
+                    <circle cx="194" cy="133" r="8" fill="#8B4513"/>
+                    <circle cx="190" cy="117" r="7" fill="#8B4513"/>
+                    <circle cx="180" cy="105" r="6" fill="#8B4513"/>
+                    <!-- Stinger -->
+                    <path d="M180,105 Q175,88 172,96" fill="#e74c3c"/>
+                    <circle cx="173" cy="90" r="4" fill="#e74c3c"/>
+                    <!-- Claws reaching for cricket -->
+                    <path d="M108,170 Q75,145 65,135 Q58,128 68,130 Q78,132 80,142" fill="#8B4513"/>
+                    <path d="M65,135 Q55,122 62,118 Q68,115 70,125" fill="#8B4513"/>
+                    <!-- Cricket (prey) -->
+                    <ellipse cx="45" cy="120" rx="15" ry="10" fill="#2ecc71"/>
+                    <ellipse cx="45" cy="120" rx="11" ry="7" fill="#27ae60"/>
+                    <circle cx="37" cy="117" r="3" fill="#fff"/>
+                    <circle cx="37" cy="117" r="1.5" fill="#000"/>
+                    <line x1="50" y1="128" x2="60" y2="145" stroke="#2ecc71" stroke-width="2"/>
+                    <line x1="42" y1="128" x2="35" y2="145" stroke="#2ecc71" stroke-width="2"/>
+                    <!-- Legs -->
+                    <line x1="120" y1="188" x2="100" y2="205" stroke="#8B4513" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="130" y1="190" x2="115" y2="208" stroke="#8B4513" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="155" y1="190" x2="170" y2="208" stroke="#8B4513" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="160" y1="188" x2="178" y2="205" stroke="#8B4513" stroke-width="3" stroke-linecap="round"/>
+                    <!-- Eyes -->
+                    <circle cx="125" cy="170" r="3" fill="#fff"/>
+                    <circle cx="125" cy="170" r="1.5" fill="#1a1a2e"/>
+                    <!-- Rocks -->
+                    <ellipse cx="230" cy="205" rx="25" ry="12" fill="#999" opacity="0.4"/>
+                    <ellipse cx="20" cy="208" rx="18" ry="9" fill="#999" opacity="0.3"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 2: Hvor mange slags? -->
+<div class="slide slide-2" data-index="2">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-3"></div>
+    <div class="slide-content">
+        <h2>&#x1F30D; Hvor mange slags skorpioner findes der?</h2>
+        <div class="content-body">
+            <div class="content-text">
+                <p>Der findes over <strong>2.700 forskellige arter</strong> af skorpioner i verden!</p>
+                <p>I Sydeuropa, for eksempel Frankrig eller Spanien, findes der over <strong>hundrede forskellige arter</strong>, men de fleste er ikke farlige for mennesker.</p>
+                <div class="fun-fact">
+                    <p>&#x1F1E9;&#x1F1F0; Der lever ikke nogen vildtlevende skorpioner i Danmark.</p>
+                </div>
+            </div>
+            <div class="content-image float-animation">
+                <svg width="300" height="260" viewBox="0 0 300 260" xmlns="http://www.w3.org/2000/svg">
+                    <!-- World map simplified -->
+                    <circle cx="150" cy="130" r="110" fill="#3498db" opacity="0.2"/>
+                    <circle cx="150" cy="130" r="100" fill="#2980b9" opacity="0.15"/>
+                    <!-- Continents simplified blobs -->
+                    <ellipse cx="100" cy="100" rx="35" ry="30" fill="#27ae60" opacity="0.6"/> <!-- Europe/Africa -->
+                    <ellipse cx="100" cy="145" rx="25" ry="25" fill="#27ae60" opacity="0.5"/> <!-- Africa -->
+                    <ellipse cx="180" cy="110" rx="40" ry="35" fill="#27ae60" opacity="0.5"/> <!-- Asia -->
+                    <ellipse cx="60" cy="120" rx="25" ry="20" fill="#27ae60" opacity="0.5"/> <!-- Americas -->
+                    <ellipse cx="200" cy="170" rx="20" ry="15" fill="#27ae60" opacity="0.5"/> <!-- Australia -->
+                    <!-- Scorpion markers -->
+                    <circle cx="95" cy="125" r="6" fill="#e74c3c"><animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite"/></circle>
+                    <circle cx="170" cy="120" r="6" fill="#e74c3c"><animate attributeName="r" values="5;7;5" dur="2.3s" repeatCount="indefinite"/></circle>
+                    <circle cx="55" cy="130" r="6" fill="#e74c3c"><animate attributeName="r" values="5;7;5" dur="1.8s" repeatCount="indefinite"/></circle>
+                    <circle cx="195" cy="165" r="6" fill="#e74c3c"><animate attributeName="r" values="5;7;5" dur="2.1s" repeatCount="indefinite"/></circle>
+                    <circle cx="100" cy="155" r="6" fill="#e74c3c"><animate attributeName="r" values="5;7;5" dur="1.9s" repeatCount="indefinite"/></circle>
+                    <!-- Big number -->
+                    <text x="150" y="235" text-anchor="middle" font-family="Fredoka One, cursive" font-size="38" fill="#2d2d44" font-weight="bold">2.700+</text>
+                    <text x="150" y="255" text-anchor="middle" font-family="Nunito, sans-serif" font-size="14" fill="#2d2d44" font-weight="700">arter i verden!</text>
+                    <!-- X over Denmark area -->
+                    <circle cx="92" cy="82" r="8" fill="none" stroke="#e74c3c" stroke-width="2"/>
+                    <line x1="87" y1="77" x2="97" y2="87" stroke="#e74c3c" stroke-width="2"/>
+                    <line x1="97" y1="77" x2="87" y2="87" stroke="#e74c3c" stroke-width="2"/>
+                    <text x="92" y="72" text-anchor="middle" font-family="Nunito" font-size="9" fill="#e74c3c" font-weight="800">DK</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 3: St&oslash;rrelse -->
+<div class="slide slide-3" data-index="3">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="slide-content">
+        <h2>&#x1F4CF; Verdens st&oslash;rste og mindste skorpion</h2>
+        <div class="size-section">
+            <div class="size-card">
+                <h3>&#x1F3C6; St&oslash;rste skorpion</h3>
+                <svg width="200" height="100" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="100" cy="55" rx="55" ry="25" fill="#2d2d44"/>
+                    <ellipse cx="100" cy="55" rx="45" ry="18" fill="#3d3d5c"/>
+                    <circle cx="155" cy="45" r="14" fill="#2d2d44"/>
+                    <circle cx="172" cy="32" r="12" fill="#2d2d44"/>
+                    <circle cx="180" cy="18" r="9" fill="#2d2d44"/>
+                    <path d="M180,18 Q177,5 174,12" fill="#e74c3c"/>
+                    <circle cx="175" cy="7" r="3" fill="#e74c3c"/>
+                    <path d="M50,50 Q20,30 18,22 Q16,16 26,19" fill="#2d2d44"/>
+                    <path d="M18,22 Q10,12 18,10 Q22,9 22,16" fill="#2d2d44"/>
+                    <line x1="75" y1="72" x2="55" y2="90" stroke="#2d2d44" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="90" y1="74" x2="75" y2="92" stroke="#2d2d44" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="118" y1="74" x2="135" y2="92" stroke="#2d2d44" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="130" y1="72" x2="150" y2="90" stroke="#2d2d44" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="82" cy="48" r="3" fill="#fff"/>
+                    <circle cx="82" cy="48" r="1.5" fill="#000"/>
+                </svg>
+                <p>Den <strong>kejserlige skovsskorpion</strong> kan blive</p>
+                <span class="size-number">23 cm</span>
+                <p>lang!</p>
+            </div>
+            <div class="size-card">
+                <h3>&#x1F90F; Mindste skorpion</h3>
+                <svg width="200" height="100" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Magnifying glass -->
+                    <circle cx="110" cy="50" r="40" fill="none" stroke="#666" stroke-width="4"/>
+                    <line x1="138" y1="78" x2="165" y2="95" stroke="#666" stroke-width="6" stroke-linecap="round"/>
+                    <circle cx="110" cy="50" r="36" fill="#e8f4f8" opacity="0.5"/>
+                    <!-- Tiny scorpion inside -->
+                    <ellipse cx="112" cy="52" rx="10" ry="6" fill="#c0392b"/>
+                    <circle cx="122" cy="49" r="4" fill="#c0392b"/>
+                    <circle cx="127" cy="44" r="3" fill="#c0392b"/>
+                    <circle cx="128" cy="38" r="2.5" fill="#c0392b"/>
+                    <circle cx="126" cy="34" r="2" fill="#e74c3c"/>
+                    <path d="M103,50 Q94,44 92,40" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="92" cy="39" r="2" fill="#c0392b"/>
+                    <circle cx="107" cy="48" r="1.5" fill="#fff"/>
+                </svg>
+                <p><strong>Tityus minimus</strong> bliver kun</p>
+                <span class="size-number small">1 cm</span>
+                <p>lang!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 4: Kan en skorpion spise sine unger? -->
+<div class="slide slide-4" data-index="4">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-3"></div>
+    <div class="slide-content">
+        <h2>&#x1F476; Kan en skorpion spise sine unger?</h2>
+        <div class="content-body">
+            <div class="content-text">
+                <p><strong>Ja</strong>, en skorpion kan godt finde p&aring; at spise sine unger. Det g&oslash;r den, hvis:</p>
+                <ul class="food-list">
+                    <li><span class="food-icon">&#x1F374;</span> Den mangler mad og ikke kan finde noget</li>
+                    <li><span class="food-icon">&#x1F494;</span> Ungerne er d&oslash;de eller misdannede</li>
+                    <li><span class="food-icon">&#x1F630;</span> Den bliver stresset under f&oslash;dslen</li>
+                </ul>
+                <div class="fun-fact">
+                    <p>&#x1F49B; Normalt er skorpionen dog s&oslash;d og b&aelig;rer sine nyf&oslash;dte unger p&aring; ryggen, til de kan klare sig selv!</p>
+                </div>
+            </div>
+            <div class="content-image float-animation">
+                <svg width="280" height="230" viewBox="0 0 280 230" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Mother scorpion with babies on back -->
+                    <!-- Body -->
+                    <ellipse cx="140" cy="150" rx="50" ry="28" fill="#5D4E37"/>
+                    <ellipse cx="140" cy="150" rx="42" ry="22" fill="#6B5B45"/>
+                    <!-- Tail -->
+                    <circle cx="190" cy="138" r="13" fill="#5D4E37"/>
+                    <circle cx="207" cy="122" r="11" fill="#5D4E37"/>
+                    <circle cx="215" cy="104" r="10" fill="#5D4E37"/>
+                    <circle cx="210" cy="86" r="9" fill="#5D4E37"/>
+                    <circle cx="198" cy="74" r="8" fill="#5D4E37"/>
+                    <path d="M198,74 Q192,58 189,66" fill="#e74c3c"/>
+                    <circle cx="190" cy="60" r="4" fill="#e74c3c"/>
+                    <!-- Claws -->
+                    <path d="M92,145 Q55,120 48,108 Q44,100 56,103" fill="#5D4E37"/>
+                    <path d="M48,108 Q38,94 46,90 Q52,88 52,98" fill="#5D4E37"/>
+                    <path d="M95,140 Q65,110 58,98 Q54,90 66,93" fill="#5D4E37"/>
+                    <path d="M58,98 Q48,84 56,80 Q62,78 62,88" fill="#5D4E37"/>
+                    <!-- Legs -->
+                    <line x1="115" y1="168" x2="90" y2="192" stroke="#5D4E37" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="125" y1="172" x2="105" y2="195" stroke="#5D4E37" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="158" y1="172" x2="178" y2="195" stroke="#5D4E37" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="165" y1="168" x2="190" y2="192" stroke="#5D4E37" stroke-width="4" stroke-linecap="round"/>
+                    <!-- Baby scorpions on back! -->
+                    <ellipse cx="120" cy="138" rx="8" ry="5" fill="#F5DEB3"/>
+                    <ellipse cx="138" cy="135" rx="8" ry="5" fill="#F5DEB3"/>
+                    <ellipse cx="155" cy="137" rx="8" ry="5" fill="#F5DEB3"/>
+                    <ellipse cx="128" cy="145" rx="7" ry="4" fill="#F5DEB3"/>
+                    <ellipse cx="148" cy="144" rx="7" ry="4" fill="#F5DEB3"/>
+                    <!-- Baby eyes (tiny dots) -->
+                    <circle cx="117" cy="136" r="1.5" fill="#000"/>
+                    <circle cx="135" cy="133" r="1.5" fill="#000"/>
+                    <circle cx="152" cy="135" r="1.5" fill="#000"/>
+                    <circle cx="125" cy="143" r="1.5" fill="#000"/>
+                    <circle cx="145" cy="142" r="1.5" fill="#000"/>
+                    <!-- Mother eyes -->
+                    <circle cx="108" cy="144" r="4" fill="#fff"/>
+                    <circle cx="108" cy="144" r="2" fill="#1a1a2e"/>
+                    <!-- Heart above -->
+                    <path d="M140,105 C140,100 133,95 128,100 C123,105 128,112 140,120 C152,112 157,105 152,100 C147,95 140,100 140,105Z" fill="#e74c3c" opacity="0.7">
+                        <animate attributeName="opacity" values="0.5;0.9;0.5" dur="2s" repeatCount="indefinite"/>
+                    </path>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 5: Farver -->
+<div class="slide slide-5" data-index="5">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="slide-content">
+        <h2>&#x1F308; Hvad for nogle farver kan en skorpion blive?</h2>
+        <div class="content-body">
+            <div class="content-text">
+                <p>Skorpionens farve er tilpasset til der, hvor den bor, s&aring; den kan <strong>gemme sig</strong> for fjender og byttedyr.</p>
+                <p>De mest almindelige farver er:</p>
+                <div class="color-grid">
+                    <div class="color-swatch" style="background: #1a1a2e;"><span>Sort</span></div>
+                    <div class="color-swatch" style="background: #4a3728;"><span>M&oslash;rkebrun</span></div>
+                    <div class="color-swatch" style="background: #d4a847;"><span>Gylden</span></div>
+                    <div class="color-swatch" style="background: #c2b280;"><span>Sandfarvet</span></div>
+                    <div class="color-swatch" style="background: #c0392b;"><span>R&oslash;dlig</span></div>
+                    <div class="color-swatch" style="background: #e67e22;"><span>Orange</span></div>
+                </div>
+                <br><br>
+                <div class="glow-badge">&#x2728; De fleste skorpioner kan lyse i m&oslash;rke! (Selvlysende!) &#x2728;</div>
+            </div>
+            <div class="content-image">
+                <svg width="260" height="260" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+                    <!-- UV glow scorpion -->
+                    <!-- Dark background circle -->
+                    <circle cx="130" cy="130" r="120" fill="#1a1a2e"/>
+                    <circle cx="130" cy="130" r="110" fill="#0d0d1a"/>
+                    <!-- Glowing scorpion -->
+                    <ellipse cx="130" cy="140" rx="40" ry="22" fill="#00ff87" opacity="0.3"/>
+                    <ellipse cx="130" cy="140" rx="35" ry="18" fill="#00ff87" opacity="0.6">
+                        <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite"/>
+                    </ellipse>
+                    <!-- Tail glow -->
+                    <circle cx="170" cy="130" r="11" fill="#00ff87" opacity="0.5">
+                        <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="183" cy="115" r="9" fill="#00ff87" opacity="0.5">
+                        <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.1s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="188" cy="98" r="8" fill="#00ff87" opacity="0.5">
+                        <animate attributeName="opacity" values="0.3;0.7;0.3" dur="1.9s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="184" cy="82" r="7" fill="#60efff" opacity="0.5">
+                        <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.3s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="174" cy="70" r="6" fill="#60efff" opacity="0.6">
+                        <animate attributeName="opacity" values="0.4;0.9;0.4" dur="1.8s" repeatCount="indefinite"/>
+                    </circle>
+                    <!-- Stinger glow -->
+                    <circle cx="168" cy="58" r="5" fill="#ff6b6b" opacity="0.8">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <!-- Claw glow -->
+                    <path d="M92,135 Q60,110 55,100" fill="none" stroke="#00ff87" stroke-width="6" opacity="0.4" stroke-linecap="round">
+                        <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite"/>
+                    </path>
+                    <circle cx="52" cy="95" r="6" fill="#00ff87" opacity="0.5"/>
+                    <path d="M95,130 Q70,100 65,90" fill="none" stroke="#00ff87" stroke-width="5" opacity="0.4" stroke-linecap="round"/>
+                    <circle cx="62" cy="85" r="5" fill="#00ff87" opacity="0.5"/>
+                    <!-- Leg glow -->
+                    <line x1="110" y1="155" x2="90" y2="175" stroke="#00ff87" stroke-width="3" opacity="0.4" stroke-linecap="round"/>
+                    <line x1="120" y1="158" x2="105" y2="178" stroke="#00ff87" stroke-width="3" opacity="0.4" stroke-linecap="round"/>
+                    <line x1="148" y1="158" x2="163" y2="178" stroke="#00ff87" stroke-width="3" opacity="0.4" stroke-linecap="round"/>
+                    <line x1="155" y1="155" x2="175" y2="175" stroke="#00ff87" stroke-width="3" opacity="0.4" stroke-linecap="round"/>
+                    <!-- UV light label -->
+                    <text x="130" y="220" text-anchor="middle" font-family="Fredoka One" font-size="14" fill="#60efff" opacity="0.8">UV-lys</text>
+                    <!-- Glow aura -->
+                    <ellipse cx="130" cy="130" rx="90" ry="70" fill="none" stroke="#00ff87" stroke-width="1" opacity="0.15">
+                        <animate attributeName="rx" values="85;95;85" dur="3s" repeatCount="indefinite"/>
+                        <animate attributeName="ry" values="65;75;65" dur="3s" repeatCount="indefinite"/>
+                    </ellipse>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLIDE 6: Alder -->
+<div class="slide slide-6" data-index="6">
+    <div class="bubble bubble-1"></div>
+    <div class="bubble bubble-2"></div>
+    <div class="slide-content">
+        <h2>&#x23F3; Hvor gammel kan en skorpion blive?</h2>
+        <div class="content-body">
+            <div class="content-text">
+                <p>Skorpioner bliver typisk mellem <strong>6 og 25 &aring;r</strong> gamle.</p>
+                <p>De sm&aring; med meget gift og sm&aring; kl&oslash;er lever oftest <strong>l&aelig;ngst</strong>, mens de store lever kortere.</p>
+                <div class="age-bar-container">
+                    <p style="font-weight:800; color:#2d2d44; font-size:1.1rem;">Levetid:</p>
+                    <div class="age-bar">
+                        <span class="age-label-left">6 &aring;r</span>
+                        <span class="age-label-right">25 &aring;r</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                        <span style="font-weight:700; color:#2d2d44;">&#x1F4AA; Store skorpioner</span>
+                        <span style="font-weight:700; color:#2d2d44;">&#x1F9EA; Sm&aring; giftige skorpioner</span>
+                    </div>
+                </div>
+            </div>
+            <div class="content-image float-animation">
+                <svg width="260" height="240" viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Old wise scorpion with birthday hat -->
+                    <!-- Body -->
+                    <ellipse cx="130" cy="155" rx="45" ry="26" fill="#8B7355"/>
+                    <ellipse cx="130" cy="155" rx="38" ry="20" fill="#9C8465"/>
+                    <!-- Tail -->
+                    <circle cx="175" cy="143" r="12" fill="#8B7355"/>
+                    <circle cx="190" cy="128" r="10" fill="#8B7355"/>
+                    <circle cx="196" cy="112" r="9" fill="#8B7355"/>
+                    <circle cx="192" cy="96" r="8" fill="#8B7355"/>
+                    <circle cx="182" cy="84" r="7" fill="#8B7355"/>
+                    <path d="M182,84 Q178,70 175,78" fill="#e74c3c"/>
+                    <circle cx="176" cy="72" r="3.5" fill="#e74c3c"/>
+                    <!-- Claws -->
+                    <path d="M88,148 Q55,125 50,115 Q47,108 58,111" fill="#8B7355"/>
+                    <path d="M50,115 Q42,102 50,98 Q56,96 55,105" fill="#8B7355"/>
+                    <!-- Legs -->
+                    <line x1="108" y1="172" x2="85" y2="195" stroke="#8B7355" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="118" y1="175" x2="100" y2="198" stroke="#8B7355" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="148" y1="175" x2="168" y2="198" stroke="#8B7355" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="155" y1="172" x2="178" y2="195" stroke="#8B7355" stroke-width="4" stroke-linecap="round"/>
+                    <!-- Birthday hat! -->
+                    <polygon points="115,130 125,85 135,130" fill="#e74c3c"/>
+                    <circle cx="125" cy="82" r="5" fill="#f1c40f"/>
+                    <line x1="115" y1="130" x2="135" y2="130" stroke="#3498db" stroke-width="3"/>
+                    <!-- Little stars -->
+                    <text x="100" y="95" font-size="16" fill="#f1c40f">&#x2B50;</text>
+                    <text x="148" y="80" font-size="12" fill="#f1c40f">&#x2B50;</text>
+                    <text x="85" y="115" font-size="10" fill="#f1c40f">&#x2B50;</text>
+                    <!-- Eyes with glasses -->
+                    <circle cx="118" cy="148" r="6" fill="none" stroke="#333" stroke-width="1.5"/>
+                    <circle cx="118" cy="148" r="3.5" fill="#fff"/>
+                    <circle cx="118" cy="148" r="1.5" fill="#000"/>
+                    <line x1="124" y1="148" x2="126" y2="148" stroke="#333" stroke-width="1.5"/>
+                    <!-- Cake -->
+                    <rect x="30" y="200" width="50" height="30" rx="5" fill="#f1c40f"/>
+                    <rect x="35" y="195" width="40" height="10" rx="3" fill="#e74c3c"/>
+                    <rect x="53" y="182" width="4" height="15" fill="#fff"/>
+                    <circle cx="55" cy="179" r="4" fill="#ff6b6b">
+                        <animate attributeName="opacity" values="0.5;1;0.5" dur="1s" repeatCount="indefinite"/>
+                    </circle>
+                    <!-- "25" text -->
+                    <text x="55" y="222" text-anchor="middle" font-family="Fredoka One" font-size="16" fill="#fff">25</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<div class="slide-number" id="slideNumber">1 / 7</div>
+
+<div class="nav">
+    <button onclick="prevSlide()" id="prevBtn">&#x25C0;</button>
+    <div class="dots" id="dots"></div>
+    <button onclick="nextSlide()" id="nextBtn">&#x25B6;</button>
+</div>
+
+<script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 0;
+
+    // Create dots
+    const dotsContainer = document.getElementById('dots');
+    for (let i = 0; i < totalSlides; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.onclick = () => goToSlide(i);
+        dotsContainer.appendChild(dot);
+    }
+
+    function updateSlides() {
+        slides.forEach((slide, i) => {
+            slide.classList.remove('active', 'prev');
+            if (i === currentSlide) {
+                slide.classList.add('active');
+            } else if (i < currentSlide) {
+                slide.classList.add('prev');
+            }
+        });
+
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === currentSlide);
+        });
+
+        document.getElementById('slideNumber').textContent = `${currentSlide + 1} / ${totalSlides}`;
+    }
+
+    function nextSlide() {
+        if (currentSlide < totalSlides - 1) {
+            currentSlide++;
+            updateSlides();
+        }
+    }
+
+    function prevSlide() {
+        if (currentSlide > 0) {
+            currentSlide--;
+            updateSlides();
+        }
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        updateSlides();
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            e.preventDefault();
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            prevSlide();
+        }
+    });
+
+    // Touch support
+    let touchStartX = 0;
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+    });
+    document.addEventListener('touchend', (e) => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) nextSlide();
+            else prevSlide();
+        }
+    });
+</script>
+
+</body>
+</html>
